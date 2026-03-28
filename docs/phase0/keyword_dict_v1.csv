@@ -1,0 +1,97 @@
+keyword,process_major,process_minor,source
+철거,철거공사,전체 철거,MANUAL
+부분 철거,철거공사,부분 철거,MANUAL
+타일 철거,철거공사,타일 철거,MANUAL
+바닥 철거,철거공사,바닥재 철거,MANUAL
+벽 철거,철거공사,벽체 철거,MANUAL
+천장 철거,철거공사,천장 철거,MANUAL
+목공 철거,철거공사,목공 철거,MANUAL
+기존 철거,철거공사,전체 철거,MANUAL
+석고보드,목공사,경량 칸막이,MANUAL
+경량철골,목공사,경량 칸막이,MANUAL
+LGS,목공사,경량 칸막이,MANUAL
+칸막이,목공사,경량 칸막이,MANUAL
+목재,목공사,목재 시공,MANUAL
+합판,목공사,목재 시공,MANUAL
+MDF,목공사,목재 시공,MANUAL
+몰딩,목공사,걸레받이/몰딩,MANUAL
+걸레받이,목공사,걸레받이/몰딩,MANUAL
+코니스,목공사,걸레받이/몰딩,MANUAL
+천장틀,목공사,천장 공사,MANUAL
+반자틀,목공사,천장 공사,MANUAL
+도배,도장/도배공사,도배,MANUAL
+실크,도장/도배공사,도배,MANUAL
+합지,도장/도배공사,도배,MANUAL
+벽지,도장/도배공사,도배,MANUAL
+페인트,도장/도배공사,도장,MANUAL
+수성페인트,도장/도배공사,도장,MANUAL
+에폭시,도장/도배공사,에폭시 도장,MANUAL
+우레탄,도장/도배공사,우레탄 도장,MANUAL
+스프레이,도장/도배공사,도장,MANUAL
+타일,타일공사,일반 타일,MANUAL
+포세린,타일공사,포세린 타일,MANUAL
+자기질,타일공사,자기질 타일,MANUAL
+모자이크,타일공사,모자이크 타일,MANUAL
+외장타일,타일공사,외장 타일,MANUAL
+줄눈,타일공사,줄눈 작업,MANUAL
+대리석,석공사,대리석 시공,MANUAL
+화강석,석공사,화강석 시공,MANUAL
+인조대리석,석공사,인조대리석,MANUAL
+강마루,바닥공사,강화마루,MANUAL
+강화마루,바닥공사,강화마루,MANUAL
+원목마루,바닥공사,원목마루,MANUAL
+LVT,바닥공사,LVT 바닥재,MANUAL
+PVC,바닥공사,PVC 바닥재,MANUAL
+장판,바닥공사,PVC 바닥재,MANUAL
+폴리싱,바닥공사,폴리싱 타일,MANUAL
+마이크로시멘트,바닥공사,마이크로시멘트,MANUAL
+데코타일,바닥공사,데코타일,MANUAL
+욕실,위생/설비공사,욕실 시공,MANUAL
+세면대,위생/설비공사,위생도기,MANUAL
+양변기,위생/설비공사,위생도기,MANUAL
+좌변기,위생/설비공사,위생도기,MANUAL
+수전,위생/설비공사,수전 교체,MANUAL
+욕조,위생/설비공사,위생도기,MANUAL
+샤워부스,위생/설비공사,욕실 시공,MANUAL
+방수,위생/설비공사,방수 처리,MANUAL
+전기,전기공사,전기 일반,MANUAL
+조명,전기공사,조명 설치,MANUAL
+LED,전기공사,조명 설치,MANUAL
+콘센트,전기공사,콘센트/스위치,MANUAL
+스위치,전기공사,콘센트/스위치,MANUAL
+분전반,전기공사,분전반,MANUAL
+배선,전기공사,전기 배선,MANUAL
+에어컨,설비공사,공조 설비,MANUAL
+냉난방,설비공사,공조 설비,MANUAL
+시스템에어컨,설비공사,시스템 에어컨,MANUAL
+환기,설비공사,환기 설비,MANUAL
+유리,유리공사,일반 유리,MANUAL
+강화유리,유리공사,강화유리,MANUAL
+파티션,유리공사,유리 파티션,MANUAL
+접합유리,유리공사,접합유리,MANUAL
+도어,창호공사,도어 설치,MANUAL
+중문,창호공사,중문 설치,MANUAL
+새시,창호공사,창호 교체,MANUAL
+창호,창호공사,창호 교체,MANUAL
+현관문,창호공사,도어 설치,MANUAL
+주방,주방공사,주방 시공,MANUAL
+싱크대,주방공사,싱크대,MANUAL
+주방가구,주방공사,주방 시공,MANUAL
+붙박이장,가구공사,붙박이장,MANUAL
+신발장,가구공사,신발장,MANUAL
+드레스룸,가구공사,붙박이장,MANUAL
+가구,가구공사,기타 가구,MANUAL
+잡공사,잡공사,기타,MANUAL
+양중,운반/양중비,양중,MANUAL
+운반,운반/양중비,운반,MANUAL
+폐기물,폐기물처리,폐기물 처리,MANUAL
+가설,가설공사,가설,MANUAL
+보양,가설공사,보양,MANUAL
+안전관리비,안전관리비,안전관리,MANUAL
+보험료,보험료,보험,MANUAL
+일반관리비,일반관리비,일반관리,MANUAL
+이윤,이윤,이윤,MANUAL
+VAT,부가가치세,부가세,MANUAL
+부가세,부가가치세,부가세,MANUAL
+합계,합계,,MANUAL
+소계,소계,,MANUAL
