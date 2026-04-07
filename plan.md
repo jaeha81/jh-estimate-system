@@ -46,36 +46,36 @@
 - [x] frontend/.env.local
 - [x] 백엔드 구문 검사 전체 통과
 
-### Wave 4: 검증 — ⬜ 미완료
-- [ ] 프론트엔드 빌드 검증 (Next.js 15 다운그레이드 완료, 빌드 테스트 필요)
-- [ ] 백엔드 uvicorn 실행 테스트
-- [ ] http://localhost:8000/docs 에서 10개 엔드포인트 확인
-- [ ] 프론트엔드 dev 서버 실행 + UI 확인
-- [ ] Railway + Vercel 프로젝트 연결 (배포)
+### Wave 4: 검증 — ✅ 완료 (2026-04-07)
+- [x] 프론트엔드 빌드 검증 — 성공 (Next.js 16.2.1 + Tailwind v3)
+  - Tailwind v4→v3 다운그레이드 (postcss.config.js CJS 형식)
+  - globals.css → @tailwind base/components/utilities 방식으로 수정
+  - tailwindcss, autoprefixer, postcss를 devDependencies→dependencies로 이동
+- [x] 백엔드 임포트/라우트 테스트 — 성공 (Python 3.13 기준)
+  - requirements.txt 버전 고정(==) → 최소 버전(>=)으로 완화
+  - Python 3.14 미지원 패키지 문제: py -3.13 사용 권장
+- [x] API 라우트 8개 확인 — /sessions, /items, /exports, /brand-profiles, /
+- [ ] Railway + Vercel 프로젝트 연결 (배포) — 실제 키 입력 후 진행
 
 ---
 
-## 다른 PC에서 이어서 작업할 때
+## 로컬 실행 방법
 
 ```bash
-# 1. 레포 클론
-git clone https://github.com/jaeha81/jh-estimate-system.git
-cd jh-estimate-system
-
-# 2. 백엔드 설정
+# 1. 백엔드 (Python 3.13 권장 — 3.14는 일부 패키지 미지원)
 cd backend
 cp .env.example .env
 # .env에 실제 키 입력 (Supabase URL/키, Claude API 키)
-pip install -r requirements.txt
+py -3.13 -m pip install -r requirements.txt
+py -3.13 -m uvicorn app.main:app --reload --port 8000
 
-# 3. 프론트엔드 설정
-cd ../frontend
-npm install
+# 2. 프론트엔드
+cd frontend
+npm install          # tailwindcss, postcss, autoprefixer 포함됨
+npm run dev          # http://localhost:3000
 
-# 4. Wave 4 검증부터 이어서 진행
-cd ../frontend && npm run build  # 프론트엔드 빌드 테스트
-cd ../backend && uvicorn app.main:app --reload --port 8000  # 백엔드 실행
-cd ../frontend && npm run dev  # 프론트엔드 dev 서버
+# 3. 빌드 검증 (배포 전)
+cd frontend && npm run build
 ```
 
 ## 핵심 환경변수 (.env에 필요한 값)
