@@ -115,9 +115,8 @@ def _classify_with_claude(items: list[dict], kw_dict: dict) -> list[dict]:
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    # 키워드 사전을 프롬프트에 주입
-    kw_sample = dict(list(kw_dict.items())[:30])
-    system = SYSTEM_PROMPT.replace("{keyword_dict_json}", json.dumps(kw_sample, ensure_ascii=False))
+    # 키워드 사전 전체를 프롬프트에 주입 (기존 30개 제한 제거)
+    system = SYSTEM_PROMPT.replace("{keyword_dict_json}", json.dumps(kw_dict, ensure_ascii=False))
 
     # 입력 준비
     input_data = [

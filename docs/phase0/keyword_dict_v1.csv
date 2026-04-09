@@ -95,3 +95,55 @@ VAT,부가가치세,부가세,MANUAL
 부가세,부가가치세,부가세,MANUAL
 합계,합계,,MANUAL
 소계,소계,,MANUAL
+EP도장,도장/도배공사,에폭시 도장,MANUAL
+UP도장,도장/도배공사,우레탄 도장,MANUAL
+VP도장,도장/도배공사,비닐 페인트 도장,MANUAL
+OP도장,도장/도배공사,오일 페인트 도장,MANUAL
+퍼티,도장/도배공사,도장 전처리,MANUAL
+실러,도장/도배공사,도장 전처리,MANUAL
+롤러,도장/도배공사,도장,MANUAL
+뿜칠,도장/도배공사,도장,MANUAL
+T-BAR,목공사,T-bar 경량천장,MANUAL
+텍스,목공사,텍스 천장,MANUAL
+루버,목공사,루버 천장/벽,MANUAL
+포인트월,목공사,포인트 벽,MANUAL
+하지,목공사,하지 작업,MANUAL
+인방,목공사,인방재,MANUAL
+각재,목공사,목재 시공,MANUAL
+OSB,목공사,목재 시공,MANUAL
+비닐타일,바닥공사,LVT 바닥재,MANUAL
+SL,바닥공사,셀프레벨링,MANUAL
+셀프레벨링,바닥공사,셀프레벨링,MANUAL
+에폭시바닥,바닥공사,에폭시 바닥,MANUAL
+폴리우레탄바닥,바닥공사,폴리우레탄 바닥,MANUAL
+모르타르,바닥공사,모르타르 미장,MANUAL
+FCU,설비공사,팬코일 유닛,MANUAL
+AHU,설비공사,공기처리장치,MANUAL
+EHP,설비공사,전기식 히트펌프,MANUAL
+GHP,설비공사,가스식 히트펌프,MANUAL
+바닥난방,설비공사,온수 바닥난방,MANUAL
+덕트,설비공사,덕트 설비,MANUAL
+급기,설비공사,급기 덕트,MANUAL
+배기,설비공사,배기 덕트,MANUAL
+도기질,타일공사,도기질 타일,MANUAL
+대형타일,타일공사,대형 타일,MANUAL
+헤링본,타일공사,헤링본 타일,MANUAL
+테라조,타일공사,테라조 타일,MANUAL
+테라코타,타일공사,테라코타 타일,MANUAL
+하부장,주방공사,주방 하부장,MANUAL
+상부장,주방공사,주방 상부장,MANUAL
+키큰장,주방공사,주방 키큰장,MANUAL
+상판,주방공사,주방 상판,MANUAL
+시스템선반,가구공사,시스템 선반,MANUAL
+옷장,가구공사,붙박이장,MANUAL
+수납장,가구공사,수납 가구,MANUAL
+전기난방,전기공사,전기 바닥난방,MANUAL
+스마트홈,전기공사,스마트홈 설비,MANUAL
+홈네트워크,전기공사,홈네트워크,MANUAL
+천장등,전기공사,조명 설치,MANUAL
+매입등,전기공사,조명 설치,MANUAL
+방음,목공사,방음 공사,MANUAL
+단열,목공사,단열 공사,MANUAL
+실리콘,잡공사,실리콘 코킹,MANUAL
+코킹,잡공사,실리콘 코킹,MANUAL
+미장,조적/미장공사,미장,MANUAL

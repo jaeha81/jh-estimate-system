@@ -90,11 +90,11 @@ def validate_csv(csv_path: Path) -> list[dict]:
             })
 
     if errors:
-        print(f"⚠️  CSV 유효성 경고 ({len(errors)}개):")
+        print(f"[WARN] CSV 유효성 경고 ({len(errors)}개):")
         for e in errors:
             print(e)
 
-    print(f"✅ CSV 검증 완료: {len(records)}개 유효 레코드")
+    print(f"[OK] CSV 검증 완료: {len(records)}개 유효 레코드")
     return records
 
 
@@ -109,16 +109,16 @@ def main():
     # 환경변수 로드
     if ENV_FILE.exists():
         load_dotenv(ENV_FILE)
-        print(f"📄 .env 로드: {ENV_FILE}")
+        print(f"[.env] 로드: {ENV_FILE}")
     else:
         load_dotenv()
-        print("📄 시스템 환경변수 사용")
+        print("[.env] 시스템 환경변수 사용")
 
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
     if not url or not key:
-        print("❌ SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY 환경변수 없음")
+        print("[ERROR] SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY 환경변수 없음")
         print("   backend/.env 파일을 확인하세요")
         sys.exit(1)
 
@@ -126,7 +126,7 @@ def main():
     records = validate_csv(args.csv)
 
     if args.dry_run:
-        print("\n🔍 Dry-run 모드: 실제 삽입 안 함")
+        print("\n[DRY-RUN] 실제 삽입 안 함")
         print("\n[샘플 레코드 3개]")
         for r in records[:3]:
             print(f"  {r}")
@@ -134,17 +134,17 @@ def main():
         return
 
     # Supabase 연결
-    print("\n🔌 Supabase 연결 중...")
+    print("\nSupabase 연결 중...")
     client: Client = create_client(url, key)
 
     # 기존 데이터 삭제 (--reset 옵션)
     if args.reset:
-        print("🗑️  기존 MANUAL 데이터 삭제 중...")
+        print("기존 MANUAL 데이터 삭제 중...")
         result = client.table("keyword_dict").delete().eq("source", "MANUAL").execute()
-        print(f"   삭제 완료")
+        print("   삭제 완료")
 
     # 배치 삽입 (중복 키 충돌 시 업데이트)
-    print(f"\n📥 {len(records)}개 레코드 삽입 중...")
+    print(f"\n{len(records)}개 레코드 삽입 중...")
     BATCH_SIZE = 50
 
     success = 0
@@ -159,16 +159,16 @@ def main():
                 .execute()
             )
             success += len(batch)
-            print(f"  ✅ {i + 1}~{min(i + BATCH_SIZE, len(records))}번 배치 완료")
+            print(f"  [OK] {i + 1}~{min(i + BATCH_SIZE, len(records))}번 배치 완료")
         except Exception as e:
-            print(f"  ❌ 배치 {i}~{i + BATCH_SIZE} 오류: {e}")
+            print(f"  [ERROR] 배치 {i}~{i + BATCH_SIZE} 오류: {e}")
             skipped += len(batch)
 
-    print(f"\n🎉 임포트 완료")
+    print(f"\n임포트 완료")
     print(f"   성공: {success}개")
     if skipped:
         print(f"   실패: {skipped}개")
-    print(f"\n다음 단계: Supabase Dashboard > Table Editor > keyword_dict 에서 확인")
+    print(f"\n확인: Supabase Dashboard > Table Editor > keyword_dict")
 
 
 if __name__ == "__main__":
