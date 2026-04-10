@@ -38,11 +38,13 @@ export interface BrandProfile {
 
 export async function createSession(
   file: File,
-  brandName?: string
+  brandName?: string,
+  aiMode?: "api" | "mock"
 ): Promise<{ session_id: string }> {
   const formData = new FormData();
   formData.append("file", file);
   if (brandName) formData.append("brand_name", brandName);
+  if (aiMode) formData.append("ai_mode", aiMode);
 
   const res = await fetch(`${API_URL}/api/v1/sessions`, {
     method: "POST",

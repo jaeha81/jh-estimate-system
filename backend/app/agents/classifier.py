@@ -67,8 +67,13 @@ def _match_keyword(item_name: str, kw_dict: dict) -> dict | None:
     return None
 
 
-def classify_items(items: list[dict]) -> list[dict]:
-    """1단계: keyword_dict 매칭 → 2단계: 미매칭만 Claude API"""
+def classify_items(items: list[dict], ai_mode: str = "api") -> list[dict]:
+    """1단계: keyword_dict 매칭 → 2단계: 미매칭 처리 (ai_mode에 따라 분기)
+
+    ai_mode:
+        "api"  — 미매칭 항목을 Claude API로 분류 (프로덕션)
+        "mock" — 미매칭 항목을 review_flag=True로 표시, API 미사용 (개발/테스트)
+    """
     kw_dict = _load_keyword_dict()
 
     matched = []
@@ -87,13 +92,23 @@ def classify_items(items: list[dict]) -> list[dict]:
         else:
             unmatched.append(item)
 
-    # 미매칭 항목을 Claude API로 분류
     if unmatched:
-        classified = _classify_with_claude(unmatched, kw_dict)
-        for item in classified:
-            conf = item.get("confidence", 0)
-            item["review_flag"] = conf < CONFIDENCE_THRESHOLD
-            matched.append(item)
+        if ai_mode == "mock":
+            # Mock 모드: API 미사용, 미매칭 항목은 사용자 확인 대기
+            for item in unmatched:
+                item["process_major"] = "미분류"
+                item["process_minor"] = None
+                item["item_name_std"] = item["item_name_raw"]
+                item["confidence"] = 0.0
+                item["review_flag"] = True
+            matched.extend(unmatched)
+        else:
+            # API 모드: Claude로 분류
+            classified = _classify_with_claude(unmatched, kw_dict)
+            for item in classified:
+                conf = item.get("confidence", 0)
+                item["review_flag"] = conf < CONFIDENCE_THRESHOLD
+                matched.append(item)
 
     return matched
 

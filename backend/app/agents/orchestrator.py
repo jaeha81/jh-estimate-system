@@ -27,6 +27,7 @@ class Orchestrator:
         file_bytes: bytes,
         file_name: str,
         brand_name: str | None = None,
+        ai_mode: str = "api",
     ) -> str:
         """전체 파이프라인 실행. 최종 status 반환."""
         db = get_db()
@@ -96,7 +97,7 @@ class Orchestrator:
             db_items = result.data or []
 
             # 8. 분류
-            classified = classify_items(db_items)
+            classified = classify_items(db_items, ai_mode=ai_mode)
 
             # 9. 분류 결과 DB 업데이트
             update_db_with_results(classified)

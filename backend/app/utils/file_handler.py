@@ -81,7 +81,8 @@ def delete_temp_file(file_path: str) -> None:
 
 
 def make_storage_path(filename: str, user_id: str | None = None) -> str:
-    """Storage 경로 생성"""
+    """Storage 경로 생성 — 한글 파일명을 UUID 기반으로 변환해 ASCII 안전한 경로 반환"""
     uid = user_id or "anonymous"
-    unique = uuid.uuid4().hex[:8]
-    return f"{uid}/{unique}_{filename}"
+    unique = uuid.uuid4().hex
+    ext = Path(filename).suffix.lower()
+    return f"{uid}/{unique}{ext}"

@@ -9,6 +9,7 @@ export default function UploadPage() {
   const router = useRouter();
   const [brands, setBrands] = useState<BrandProfile[]>([]);
   const [selectedBrand, setSelectedBrand] = useState("");
+  const [aiMode, setAiMode] = useState<"api" | "mock">("mock");
   const [isUploading, setIsUploading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [error, setError] = useState("");
@@ -28,7 +29,8 @@ export default function UploadPage() {
       try {
         const { session_id } = await createSession(
           file,
-          selectedBrand || undefined
+          selectedBrand || undefined,
+          aiMode
         );
         setStatusMessage("AI 분류 처리 중...");
 
@@ -72,7 +74,7 @@ export default function UploadPage() {
         setIsUploading(false);
       }
     },
-    [selectedBrand, router]
+    [selectedBrand, aiMode, router]
   );
 
   return (
@@ -102,6 +104,45 @@ export default function UploadPage() {
             </option>
           ))}
         </select>
+      </div>
+
+      {/* AI 모드 선택 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          AI 분류 모드
+        </label>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setAiMode("mock")}
+            disabled={isUploading}
+            className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+              aiMode === "mock"
+                ? "border-blue-600 bg-blue-50 text-blue-700"
+                : "border-gray-200 text-gray-600 hover:border-gray-300"
+            }`}
+          >
+            <div className="font-semibold">테스트 모드</div>
+            <div className="text-xs mt-0.5 font-normal opacity-75">
+              키워드 사전만 사용 · API 크레딧 미사용
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAiMode("api")}
+            disabled={isUploading}
+            className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+              aiMode === "api"
+                ? "border-green-600 bg-green-50 text-green-700"
+                : "border-gray-200 text-gray-600 hover:border-gray-300"
+            }`}
+          >
+            <div className="font-semibold">Claude AI 모드</div>
+            <div className="text-xs mt-0.5 font-normal opacity-75">
+              미매칭 항목 Claude API 분류 · 프로덕션용
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* 업로드 존 */}

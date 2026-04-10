@@ -13,12 +13,26 @@ router = APIRouter(prefix="/sessions", tags=["sessions"])
 
 @router.post("", response_model=SessionCreateResponse)
 async def create_session(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     brand_name: Optional[str] = Form(None),
-    background_tasks: BackgroundTasks = BackgroundTasks(),
+    ai_mode: Optional[str] = Form(None),
 ):
-    """파일 업로드 → 세션 생성 → 백그라운드 파이프라인 실행"""
-    file_bytes, safe_name = await read_upload_file(file)
+    """파일 업로드 → 세션 생성 → 백그라운드 파이프라인 실행
+
+    ai_mode: "api" (Claude API 사용) | "mock" (키워드 전용, 개발/테스트용)
+    미지정 시 서버 환경변수 AI_MODE 값 사용 (기본: api)
+    """
+    try:
+        file_bytes, safe_name = await read_upload_file(file)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    # ai_mode 결정: 요청 파라미터 > 서버 환경변수 > 기본값 "api"
+    import os
+    resolved_ai_mode = ai_mode or os.getenv("AI_MODE", "api")
+    if resolved_ai_mode not in ("api", "mock"):
+        resolved_ai_mode = "api"
 
     db = get_db()
     result = db.table("estimate_sessions").insert({
@@ -30,7 +44,7 @@ async def create_session(
 
     orchestrator = Orchestrator()
     background_tasks.add_task(
-        orchestrator.run_pipeline, session_id, file_bytes, safe_name, brand_name
+        orchestrator.run_pipeline, session_id, file_bytes, safe_name, brand_name, resolved_ai_mode
     )
 
     return SessionCreateResponse(session_id=session_id)
@@ -41,12 +55,15 @@ async def get_session(session_id: str):
     """세션 상태 조회"""
     db = get_db()
 
-    result = (
-        db.table("estimate_sessions")
-        .select("*, brand_profiles(brand_name)")
-        .eq("id", session_id)
-        .execute()
-    )
+    try:
+        result = (
+            db.table("estimate_sessions")
+            .select("*, brand_profiles(brand_name)")
+            .eq("id", session_id)
+            .execute()
+        )
+    except Exception:
+        raise HTTPException(status_code=400, detail="유효하지 않은 세션 ID입니다")
 
     if not result.data:
         raise HTTPException(status_code=404, detail="세션을 찾을 수 없습니다")
