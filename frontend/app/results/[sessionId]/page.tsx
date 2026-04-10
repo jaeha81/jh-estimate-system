@@ -14,7 +14,32 @@ export default function ResultsPage() {
 
   useEffect(() => {
     if (!sessionId) return;
-    getSession(sessionId).then(setSession);
+
+    const fetchAndPoll = async () => {
+      const data = await getSession(sessionId);
+      setSession(data);
+
+      // PROCESSING 상태면 2초 간격 폴링 (최대 90초)
+      if (data.status === "PROCESSING" || data.status === "PENDING") {
+        let attempts = 0;
+        const timer = setInterval(async () => {
+          attempts++;
+          try {
+            const updated = await getSession(sessionId);
+            setSession(updated);
+            if (updated.status !== "PROCESSING" && updated.status !== "PENDING") {
+              clearInterval(timer);
+            }
+          } catch {
+            clearInterval(timer);
+          }
+          if (attempts >= 45) clearInterval(timer);
+        }, 2000);
+        return () => clearInterval(timer);
+      }
+    };
+
+    fetchAndPoll();
   }, [sessionId]);
 
   const handleDownload = async () => {
@@ -73,6 +98,21 @@ export default function ResultsPage() {
           </div>
         </div>
       </div>
+
+      {/* 컨펌 대기 안내 */}
+      {session.status === "CONFIRM_WAIT" && (
+        <div className="space-y-3">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+            {session.review_items}개 항목의 공정 분류를 확인해야 합니다.
+          </div>
+          <Link
+            href={`/confirm/${sessionId}`}
+            className="block w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl font-medium text-center"
+          >
+            공정 분류 확인하기 →
+          </Link>
+        </div>
+      )}
 
       {/* 다운로드 */}
       {session.status === "DONE" && (

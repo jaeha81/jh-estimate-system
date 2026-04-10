@@ -1,12 +1,17 @@
 """공정 분류 에이전트 — keyword_dict 우선 + Claude API 보조"""
 
+import csv
 import json
 import os
 from functools import lru_cache
+from pathlib import Path
 
 import anthropic
 
 from app.models.db import get_db
+
+# 로컬 CSV 폴백 경로 (Supabase 연결 불가 시 사용)
+_LOCAL_CSV = Path(__file__).parent.parent.parent.parent / "docs" / "phase0" / "keyword_dict_v1.csv"
 
 CONFIDENCE_THRESHOLD = float(os.getenv("CONFIDENCE_THRESHOLD", "0.7"))
 
@@ -42,16 +47,35 @@ JSON 배열: [{"id": "uuid", "process_major": "대공종", "process_minor": "세
 
 @lru_cache(maxsize=1)
 def _load_keyword_dict() -> dict[str, dict]:
-    """keyword_dict 테이블 전체를 메모리 캐시"""
-    db = get_db()
-    result = db.table("keyword_dict").select("keyword, process_major, process_minor").execute()
-    mapping = {}
-    for row in result.data or []:
-        mapping[row["keyword"].strip()] = {
-            "process_major": row["process_major"],
-            "process_minor": row.get("process_minor"),
-        }
-    return mapping
+    """keyword_dict 테이블 전체를 메모리 캐시. DB 연결 실패 시 로컬 CSV 폴백."""
+    try:
+        db = get_db()
+        result = db.table("keyword_dict").select("keyword, process_major, process_minor").execute()
+        if result.data:
+            mapping = {}
+            for row in result.data:
+                mapping[row["keyword"].strip()] = {
+                    "process_major": row["process_major"],
+                    "process_minor": row.get("process_minor"),
+                }
+            return mapping
+    except Exception:
+        pass
+
+    # 로컬 CSV 폴백
+    if _LOCAL_CSV.exists():
+        mapping = {}
+        with open(_LOCAL_CSV, encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                keyword = row.get("keyword", "").strip()
+                if keyword:
+                    mapping[keyword] = {
+                        "process_major": row.get("process_major", "미분류"),
+                        "process_minor": row.get("process_minor") or None,
+                    }
+        return mapping
+
+    return {}
 
 
 def _match_keyword(item_name: str, kw_dict: dict) -> dict | None:
