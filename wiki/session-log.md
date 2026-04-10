@@ -6,6 +6,31 @@
 
 ---
 
+## 세션 3 (2026-04-10)
+
+### 완료된 작업
+
+- **Next.js 15.3.1 → 14.2.35 다운그레이드**: Windows Node.js 22 SWC 빌드 블로커 2건 해결
+  - `next build` + `next dev` 모두 정상 동작 확인
+- **Vercel 프론트엔드 배포 완료**: <https://frontend-six-bice-h5ixxwa1ij.vercel.app>
+  - `vercel.json` `rootDirectory` 불필요 속성 제거
+  - `NEXT_PUBLIC_API_URL` 환경변수 등록
+- **CORS_ORIGINS Vercel URL 추가**: `backend/.env` + `.env.example`
+- **API 오류 처리 개선**: `brands.py` 오프라인 폴백, `items.py` 503 응답
+- **`backend/nixpacks.toml` 추가**: Railway 배포 시 Python 3.11 강제 지정
+- **`frontend/lib/api.ts` 타임아웃 추가**: 모든 fetch 10초 타임아웃 (업로드/export 30초)
+- **`wiki/known-issues.md` 신규 생성**: 해결된 이슈 4건, 알려진 제약 4건 문서화
+- **GitHub push 완료**: `ed05564`, `6aaff4d`, `bd80d0f`
+
+### 남은 작업
+
+- Railway 유료 플랜 전환 후 백엔드 배포
+- Railway URL 확정 후 Vercel `NEXT_PUBLIC_API_URL` 업데이트
+- keyword_dict Supabase 동기화 (`python scripts/import_keywords.py --reset`)
+- End-to-end 테스트 (백엔드 배포 후)
+
+---
+
 ## 세션 2 (2026-04-10)
 
 ### 완료된 작업

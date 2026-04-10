@@ -6,6 +6,14 @@
 
 > end-to-end 연결을 위한 순서. 한 번만 하면 됨.
 
+## 현재 배포 상태
+
+| 서비스 | URL | 상태 |
+| --- | --- | --- |
+| **Vercel (프론트엔드)** | [frontend-six-bice-h5ixxwa1ij.vercel.app](https://frontend-six-bice-h5ixxwa1ij.vercel.app) | ✅ 배포 완료 |
+| **Railway (백엔드)** | 미정 (유료 플랜 전환 후 배포 예정) | ⏳ 대기 중 |
+| **Supabase** | zpqbytnddorsnxiqblko.supabase.co | ✅ 세팅 완료 |
+
 ---
 
 ## 1. Supabase 세팅
@@ -25,20 +33,21 @@
 - [ ] `jaeha81/jh-estimate-system` 선택
 
 ### 2-2. 서비스 설정
-Railway가 루트의 `railway.toml`을 자동 감지함 → `backend/` 디렉터리 사용.
+`backend/railway.json` + `backend/nixpacks.toml` 자동 감지됨.
 
 추가 확인:
-- [ ] Settings > Build Command: `pip install -r requirements.txt`
-- [ ] Settings > Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- [ ] Settings > Root Directory: `backend` (railway.toml에 이미 설정됨)
+
+- [ ] Settings > Root Directory: `backend`
+- [ ] Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT` (railway.json에 설정됨)
+- [ ] Python 3.11 빌드: nixpacks.toml에 설정됨
 
 ### 2-3. 환경변수 등록
 Railway Dashboard > Variables 탭에서 아래 설정:
 
 ```
-SUPABASE_URL=https://xxxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=service_role_key_here
-CLAUDE_API_KEY=sk-ant-api03-...
+SUPABASE_URL=https://zpqbytnddorsnxiqblko.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
+CLAUDE_API_KEY=<sk-ant-api03-...>
 CLAUDE_MODEL=claude-sonnet-4-6
 CONFIDENCE_THRESHOLD=0.7
 MAX_UPLOAD_SIZE_MB=50
@@ -46,10 +55,9 @@ ALLOWED_EXTENSIONS=.xlsx,.xls,.pdf
 SUPABASE_BUCKET=estimate-files
 APP_ENV=production
 LOG_LEVEL=INFO
-CORS_ORIGINS=https://your-vercel-domain.vercel.app
+AI_MODE=mock
+CORS_ORIGINS=https://frontend-six-bice-h5ixxwa1ij.vercel.app
 ```
-
-> CORS_ORIGINS는 Vercel 배포 후 실제 도메인으로 업데이트 필요.
 
 ### 2-4. 배포 확인
 - [ ] Deploy 완료 후 Railway에서 도메인 확인 (예: `https://jh-estimate-backend.up.railway.app`)

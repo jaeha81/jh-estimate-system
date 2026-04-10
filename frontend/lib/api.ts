@@ -1,5 +1,24 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeoutMs = 10000
+): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error("요청 시간 초과 — 백엔드 서버에 연결할 수 없습니다");
+    }
+    throw err;
+  } finally {
+    clearTimeout(id);
+  }
+}
+
 export interface LineItem {
   id: string;
   item_name_raw: string;
@@ -46,16 +65,17 @@ export async function createSession(
   if (brandName) formData.append("brand_name", brandName);
   if (aiMode) formData.append("ai_mode", aiMode);
 
-  const res = await fetch(`${API_URL}/api/v1/sessions`, {
-    method: "POST",
-    body: formData,
-  });
+  const res = await fetchWithTimeout(
+    `${API_URL}/api/v1/sessions`,
+    { method: "POST", body: formData },
+    30000
+  );
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
 export async function getSession(sessionId: string): Promise<SessionStatus> {
-  const res = await fetch(`${API_URL}/api/v1/sessions/${sessionId}`);
+  const res = await fetchWithTimeout(`${API_URL}/api/v1/sessions/${sessionId}`);
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
@@ -65,7 +85,7 @@ export async function getItems(
   reviewOnly = false
 ): Promise<{ items: LineItem[]; total: number; review_count: number }> {
   const url = `${API_URL}/api/v1/sessions/${sessionId}/items?review_only=${reviewOnly}`;
-  const res = await fetch(url);
+  const res = await fetchWithTimeout(url);
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
@@ -78,20 +98,25 @@ export async function confirmItem(
     item_name_std?: string;
   }
 ): Promise<void> {
-  const res = await fetch(`${API_URL}/api/v1/items/${itemId}/confirm`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  const res = await fetchWithTimeout(
+    `${API_URL}/api/v1/items/${itemId}/confirm`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }
+  );
   if (!res.ok) throw new Error(await res.text());
 }
 
 export async function exportSession(
   sessionId: string
 ): Promise<{ download_url: string }> {
-  const res = await fetch(`${API_URL}/api/v1/sessions/${sessionId}/export`, {
-    method: "POST",
-  });
+  const res = await fetchWithTimeout(
+    `${API_URL}/api/v1/sessions/${sessionId}/export`,
+    { method: "POST" },
+    30000
+  );
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
@@ -100,7 +125,7 @@ export async function getBrands(): Promise<{
   brands: BrandProfile[];
   total: number;
 }> {
-  const res = await fetch(`${API_URL}/api/v1/brand-profiles`);
+  const res = await fetchWithTimeout(`${API_URL}/api/v1/brand-profiles`);
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
