@@ -17,14 +17,15 @@ router = APIRouter(tags=["items"])
 @router.get("/sessions/{session_id}/items", response_model=ItemsListResponse)
 async def get_items(session_id: str, review_only: bool = Query(False)):
     """세션의 항목 목록 조회"""
-    db = get_db()
-
-    query = db.table("estimate_line_items").select("*").eq("session_id", session_id)
-    if review_only:
-        query = query.eq("review_flag", True).is_("confirmed_at", "null")
-
-    result = query.order("source_row").execute()
-    items = result.data or []
+    try:
+        db = get_db()
+        query = db.table("estimate_line_items").select("*").eq("session_id", session_id)
+        if review_only:
+            query = query.eq("review_flag", True).is_("confirmed_at", "null")
+        result = query.order("source_row").execute()
+        items = result.data or []
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"데이터베이스 연결 실패: {e}")
 
     review_count = sum(
         1 for i in items if i.get("review_flag") and not i.get("confirmed_at")
@@ -41,10 +42,16 @@ async def get_items(session_id: str, review_only: bool = Query(False)):
 @router.patch("/items/{item_id}/confirm", response_model=LineItemConfirmResponse)
 async def confirm_item(item_id: str, body: LineItemConfirmRequest):
     """공정 확정 + keyword_dict USER_CONFIRM 누적"""
-    db = get_db()
+    try:
+        db = get_db()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"데이터베이스 연결 실패: {e}")
 
     # 항목 조회
-    result = db.table("estimate_line_items").select("*").eq("id", item_id).execute()
+    try:
+        result = db.table("estimate_line_items").select("*").eq("id", item_id).execute()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"데이터베이스 연결 실패: {e}")
     if not result.data:
         raise HTTPException(status_code=404, detail="항목을 찾을 수 없습니다")
 
