@@ -1,8 +1,45 @@
 ---
-최종 업데이트: 2026-04-10
+최종 업데이트: 2026-04-12
 ---
 
 # 세션 작업 이력
+
+---
+
+## 세션 4 (2026-04-12)
+
+### 완료된 작업
+
+#### 핵심 버그 수정 3건 (commit `ed7990b`)
+
+| 파일 | 문제 | 수정 |
+|------|------|------|
+| `backend/app/services/excel_service.py` | 결과 Excel에 분류 데이터 전혀 없음 | `write_classification_sheet()` 신규 — "공정분류결과" 시트 추가 (12열, 필터+헤더고정) |
+| `backend/app/agents/bid_formatter.py` | format()이 원본 데이터만 복원, 분류 결과 미출력 | `write_classification_sheet()` 호출 추가 |
+| `backend/app/routers/items.py` | 컨펌 완료 후 DONE 상태 전환 안 되는 엣지케이스 | 마지막 review 항목 확정 시 `trigger_export()` 자동 호출 |
+
+#### gitignore 정리 (commit `58b7d93`)
+
+- `.claude/` IDE 설정 gitignore 추가
+
+#### 파이프라인 단위 테스트 — 전체 통과
+
+- 한샘리하우스 34평 샘플 18개 항목 mock 분류
+- 파싱 18개 / 자동분류 18개 / review 0개 (keyword_dict 전량 매칭)
+- 결과 Excel: `['세부내역서', '표지', '공정분류결과']` 3시트 생성 확인
+- 헤더: `원본행 | 품명(원본) | 표준품명 | 대공종 | 세부공종 | 규격 | 단위 | 수량 | 단가 | 금액 | 신뢰도 | 확인여부`
+
+#### keyword_dict 임포트 — Supabase DNS 미연결로 보류
+
+- dry-run 149개 유효 확인
+- Railway 배포 완료 후 `python scripts/import_keywords.py --reset` 재시도 필요
+
+### 세션 4 남은 작업
+
+- Railway 유료 플랜 전환 → 백엔드 배포 (사용자 직접)
+- Railway URL 확정 → Vercel `NEXT_PUBLIC_API_URL` 업데이트 (사용자 직접)
+- `python scripts/import_keywords.py --reset` (인터넷 연결 확인 후)
+- 실제 배포 환경 end-to-end 테스트
 
 ---
 
@@ -22,7 +59,7 @@
 - **`wiki/known-issues.md` 신규 생성**: 해결된 이슈 4건, 알려진 제약 4건 문서화
 - **GitHub push 완료**: `ed05564`, `6aaff4d`, `bd80d0f`
 
-### 남은 작업
+### 세션 3 남은 작업
 
 - Railway 유료 플랜 전환 후 백엔드 배포
 - Railway URL 확정 후 Vercel `NEXT_PUBLIC_API_URL` 업데이트
