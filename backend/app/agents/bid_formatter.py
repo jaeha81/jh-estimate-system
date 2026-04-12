@@ -3,7 +3,11 @@
 import os
 
 from app.models.db import get_db
-from app.services.excel_service import write_results_to_excel, make_output_path
+from app.services.excel_service import (
+    write_results_to_excel,
+    write_classification_sheet,
+    make_output_path,
+)
 from app.utils.file_handler import (
     download_from_storage,
     upload_to_storage,
@@ -54,7 +58,7 @@ class BidFormatter:
         )
         items = items_result.data or []
 
-        # 결과 되쓰기
+        # 결과 되쓰기 (원본 시트 — 수량/단가 등 복원)
         output_path = make_output_path(temp_source)
         write_results_to_excel(
             source_path=temp_source,
@@ -64,6 +68,9 @@ class BidFormatter:
             items=items,
             data_start_row=data_start_row,
         )
+
+        # 공정 분류 결과 시트 추가 (원본 시트 보존)
+        write_classification_sheet(output_path=output_path, items=items)
 
         # Storage 업로드
         with open(output_path, "rb") as f:

@@ -132,6 +132,81 @@ def write_results_to_excel(
     return output_path
 
 
+def write_classification_sheet(
+    output_path: str,
+    items: list[dict],
+    sheet_name: str = "공정분류결과",
+) -> str:
+    """분류 결과를 별도 시트로 추가. 원본 시트는 보존."""
+    from openpyxl.styles import Font, PatternFill, Alignment
+
+    wb = load_workbook(output_path)
+
+    # 기존 시트 있으면 제거 후 재생성
+    if sheet_name in wb.sheetnames:
+        del wb[sheet_name]
+    ws = wb.create_sheet(sheet_name)
+
+    headers = [
+        "원본행",
+        "품명(원본)",
+        "표준품명",
+        "대공종",
+        "세부공종",
+        "규격",
+        "단위",
+        "수량",
+        "단가",
+        "금액",
+        "신뢰도",
+        "확인여부",
+    ]
+    ws.append(headers)
+
+    # 헤더 스타일
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill("solid", fgColor="4472C4")
+    center = Alignment(horizontal="center", vertical="center")
+    for col_idx in range(1, len(headers) + 1):
+        cell = ws.cell(row=1, column=col_idx)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center
+
+    # 정렬: source_row 기준
+    sorted_items = sorted(items, key=lambda x: x.get("source_row") or 0)
+
+    for item in sorted_items:
+        confirmed = "✓" if item.get("confirmed_at") else ("검토필요" if item.get("review_flag") else "자동")
+        ws.append([
+            item.get("source_row"),
+            item.get("item_name_raw"),
+            item.get("item_name_std"),
+            item.get("process_major"),
+            item.get("process_minor"),
+            item.get("spec"),
+            item.get("unit"),
+            item.get("qty"),
+            item.get("unit_price"),
+            item.get("amount"),
+            round(item["confidence"], 2) if item.get("confidence") is not None else None,
+            confirmed,
+        ])
+
+    # 열 폭 자동
+    widths = [8, 32, 28, 14, 16, 20, 8, 10, 12, 14, 10, 10]
+    for i, w in enumerate(widths, start=1):
+        ws.column_dimensions[ws.cell(row=1, column=i).column_letter].width = w
+
+    # 필터 + 첫 행 고정
+    ws.auto_filter.ref = ws.dimensions
+    ws.freeze_panes = "A2"
+
+    wb.save(output_path)
+    wb.close()
+    return output_path
+
+
 def save_upload_to_temp(file_bytes: bytes, filename: str) -> str:
     """업로드 파일을 임시 경로에 저장"""
     temp_dir = tempfile.mkdtemp(prefix="jh_estimate_")

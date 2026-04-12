@@ -3,6 +3,8 @@
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Query
 
+import logging
+
 from app.models.db import get_db
 from app.schemas.estimate import (
     ItemsListResponse,
@@ -10,6 +12,8 @@ from app.schemas.estimate import (
     LineItemConfirmRequest,
     LineItemConfirmResponse,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["items"])
 
@@ -96,5 +100,28 @@ async def confirm_item(item_id: str, body: LineItemConfirmRequest):
             "source": "USER_CONFIRM",
             "confirm_count": 1,
         }).execute()
+
+    # 세션 모든 review 항목 완료 시 자동 export + DONE 전환
+    try:
+        remaining = (
+            db.table("estimate_line_items")
+            .select("id")
+            .eq("session_id", item["session_id"])
+            .eq("review_flag", True)
+            .is_("confirmed_at", "null")
+            .execute()
+        )
+        if not (remaining.data or []):
+            from app.agents.orchestrator import Orchestrator
+
+            try:
+                Orchestrator().trigger_export(item["session_id"])
+            except Exception as exc:
+                # export 실패해도 confirm 응답은 성공으로 반환
+                logger.error(
+                    f"자동 export 실패 (session={item['session_id']}): {exc}"
+                )
+    except Exception as exc:
+        logger.error(f"컨펌 완료 상태 확인 실패 (item={item_id}): {exc}")
 
     return LineItemConfirmResponse(id=item_id)
