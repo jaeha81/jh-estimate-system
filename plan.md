@@ -1,4 +1,53 @@
-# Plan: JH-견적시스템 Phase 1 MVP — 구현 진행 상황
+# Plan: JH-견적시스템 Phase 2 — pdf_analyzer + inspector 구현
+
+## 최종 업데이트: 2026-04-26
+
+---
+
+## 배포 블로커 (사용자 액션 필요, 코드 작업 없음)
+
+1. Railway 유료 플랜 전환 → 백엔드 배포
+2. Railway 도메인 → Vercel `NEXT_PUBLIC_API_URL` 업데이트
+3. Railway `CORS_ORIGINS` 환경변수 업데이트
+4. `python scripts/import_keywords.py --reset` (Supabase 실 임포트)
+5. 한샘 샘플 Excel end-to-end 검증
+
+---
+
+## 구현 범위 (Phase 2)
+
+### Task 1 — `backend/app/agents/pdf_analyzer.py` (신규)
+- PDF → Claude API (claude-sonnet-4-6) → 공정 항목 리스트 추출
+- 출력: `[{item_name, quantity, unit, estimated_cost}]`
+- 오류 시 빈 리스트 반환 (파이프라인 비중단)
+
+### Task 2 — `backend/app/agents/inspector.py` (신규)
+- classifier 분류 결과 → 품질 검수
+- 검수: 공정 누락 / confidence 낮은 항목 / 중복 감지
+- 출력: `{passed, issues: [{item_id, reason}], confidence_summary}`
+
+### Task 3 — `backend/app/agents/orchestrator.py` 수정
+- PDF 파일 감지 → pdf_analyzer 호출 분기
+- Step 9 위치에 inspector.run() 삽입
+
+### Task 4 — `backend/app/routers/sessions.py` 수정
+- PDF 확장자 허용 추가 (현재 xlsx/xls만 허용)
+
+---
+
+## 스코프 외 (이번 제외)
+- Kakao Alimtalk (별도 세션)
+- 브랜드 어드민 UI
+- Redis 캐시
+
+---
+
+계획이 완료되었습니다. 검토 후 메모를 남겨주시거나 구현 승인을 해주세요.
+아직 코드를 수정하지는 않았습니다.
+
+---
+
+# (이전) Phase 1 MVP 기록
 
 ## 최종 업데이트: 2026-03-28
 
