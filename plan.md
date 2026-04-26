@@ -1,16 +1,27 @@
 # Plan: JH-견적시스템 Phase 2 — pdf_analyzer + inspector 구현
 
-## 최종 업데이트: 2026-04-26
+## 최종 업데이트: 2026-04-27
+
+> **운영 방식 확정**: 로컬 전용 (구독형 개인 개발 도구). Railway/Vercel 배포 불필요.
 
 ---
 
-## 배포 블로커 (사용자 액션 필요, 코드 작업 없음)
+## ✅ Phase 2 구현 완료 (2026-04-27)
 
-1. Railway 유료 플랜 전환 → 백엔드 배포
-2. Railway 도메인 → Vercel `NEXT_PUBLIC_API_URL` 업데이트
-3. Railway `CORS_ORIGINS` 환경변수 업데이트
-4. `python scripts/import_keywords.py --reset` (Supabase 실 임포트)
-5. 한샘 샘플 Excel end-to-end 검증
+- [x] `pdf_analyzer.py` — PDF → Claude API → 공정 항목 추출
+- [x] `inspector.py` — 분류 결과 품질 검수 (신뢰도/누락/중복)
+- [x] `orchestrator.py` — PDF/Excel 분기 + inspector 삽입
+- [x] `file_handler.py` — `.pdf` 확장자 허용
+
+---
+
+## 로컬 실행 체크리스트
+
+1. `backend/.env` 에 `ANTHROPIC_API_KEY=sk-ant-...` 추가 (PDF 분석 시 필요)
+2. `backend/.env` 의 `AI_MODE=api` 로 변경 (현재: mock)
+3. `python scripts/import_keywords.py --reset` — Supabase 키워드 사전 실 임포트
+4. `start-local.bat` 실행 → 백엔드(8000) + 프론트엔드(3000) 동시 기동
+5. 한샘 샘플 Excel/PDF end-to-end 검증
 
 ---
 
