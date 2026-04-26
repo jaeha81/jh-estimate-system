@@ -53,3 +53,5 @@ htmlcov/
 ~$*.xlsx
 ~$*.xls
 .vercel
+backend/local.db
+backend/local_storage/
