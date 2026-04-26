@@ -114,4 +114,10 @@ def _to_float(value) -> float | None:
     try:
         return float(value)
     except (TypeError, ValueError):
+        pass
+    # 한국어 금액 포맷 처리: "1,000원" → 1000.0
+    try:
+        cleaned = str(value).replace(",", "").replace("원", "").strip()
+        return float(cleaned) if cleaned else None
+    except (TypeError, ValueError):
         return None

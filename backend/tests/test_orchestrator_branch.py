@@ -69,7 +69,71 @@ def test_inspector_called_in_pipeline():
         print(f"  PASS  test_inspector_called_in_pipeline (status={status})")
 
 
+def test_pdf_pipeline_calls_pdf_analyzer():
+    """PDF 파일명으로 run_pipeline 호출 시 PdfAnalyzer.analyze가 실행되는지 확인"""
+    # 인스턴스 수준에서 직접 mock — reload 없이 패치 안정성 확보
+    from app.agents.orchestrator import Orchestrator
+
+    orch = Orchestrator()
+
+    pdf_mock = MagicMock()
+    pdf_mock.analyze.return_value = [
+        {"item_name": "도배공사", "quantity": 50.0, "unit": "m²", "estimated_cost": 8000.0}
+    ]
+    orch.pdf_analyzer = pdf_mock
+    orch.inspector = MagicMock()
+    orch.inspector.run.return_value = {
+        "passed": True, "issues": [], "confidence_summary": {"high": 1, "medium": 0, "low": 0}
+    }
+    orch.bid_formatter = MagicMock()
+
+    db = MagicMock()
+    db.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+    db.table.return_value.insert.return_value.execute.return_value = MagicMock()
+    db.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
+        {"id": "p1", "item_name_raw": "도배공사", "process_major": "도장/도배공사",
+         "confidence": 0.85, "review_flag": False}
+    ]
+
+    with patch("app.agents.orchestrator.get_db", return_value=db), \
+         patch("app.agents.orchestrator.upload_to_storage"), \
+         patch("app.agents.orchestrator.make_storage_path", return_value="test/path.pdf"), \
+         patch("app.agents.orchestrator.classify_items", return_value=[
+             {"id": "p1", "item_name_raw": "도배공사", "item_name_std": "도배공사",
+              "process_major": "도장/도배공사", "confidence": 0.85, "review_flag": False}
+         ]), \
+         patch("app.agents.orchestrator.update_db_with_results"):
+
+        status = orch.run_pipeline("sess-pdf", b"fake_pdf_bytes", "estimate.pdf")
+
+    assert pdf_mock.analyze.called, "PdfAnalyzer.analyze가 호출되지 않음"
+    assert db.table.return_value.insert.called, "PDF 항목 insert가 호출되지 않음"
+    print(f"  PASS  test_pdf_pipeline_calls_pdf_analyzer (status={status})")
+
+
+def test_to_float_korean_format():
+    """pdf_analyzer._to_float이 한국어 금액 포맷 처리하는지 확인"""
+    from app.agents.pdf_analyzer import _to_float
+    assert _to_float("1,000") == 1000.0,    f"'1,000' 파싱 실패"
+    assert _to_float("10,000원") == 10000.0, f"'10,000원' 파싱 실패"
+    assert _to_float(None) is None
+    assert _to_float("abc") is None
+    assert _to_float(5000) == 5000.0
+    print("  PASS  test_to_float_korean_format")
+
+
 if __name__ == "__main__":
-    test_pdf_branch_detected()
-    test_inspector_called_in_pipeline()
-    print("\n결과: 2/2 통과")
+    tests = [
+        test_pdf_branch_detected,
+        test_inspector_called_in_pipeline,
+        test_pdf_pipeline_calls_pdf_analyzer,
+        test_to_float_korean_format,
+    ]
+    passed = 0
+    for t in tests:
+        try:
+            t()
+            passed += 1
+        except Exception as e:
+            print(f"  FAIL  {t.__name__}: {e}")
+    print(f"\n결과: {passed}/{len(tests)} 통과")
