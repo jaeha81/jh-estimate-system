@@ -9,7 +9,7 @@ from fastapi import UploadFile
 
 from app.models.db import get_db
 
-ALLOWED_EXTENSIONS = {".xlsx", ".xls"}
+ALLOWED_EXTENSIONS = {".xlsx", ".xls", ".pdf"}
 MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50MB
 BUCKET_NAME = os.getenv("SUPABASE_BUCKET", "estimate-files")
 
