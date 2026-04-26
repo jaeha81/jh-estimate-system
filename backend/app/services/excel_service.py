@@ -220,3 +220,42 @@ def make_output_path(source_path: str) -> str:
     """원본 경로 기반 출력 파일 경로 생성"""
     base, ext = os.path.splitext(source_path)
     return f"{base}_result{ext}"
+
+
+def create_pdf_result_excel(items: list, original_filename: str) -> str:
+    """PDF 업로드 결과용 신규 Excel 파일 생성 → 임시 파일 경로 반환"""
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "견적 결과"
+
+    headers = ["항목명(원본)", "표준명", "규격", "단위", "수량", "단가", "금액", "대공정", "소공정", "신뢰도", "검토"]
+    header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    header_font = Font(color="FFFFFF", bold=True)
+
+    for col, h in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=h)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center")
+
+    for row, item in enumerate(items, 2):
+        ws.cell(row=row, column=1, value=item.get("item_name_raw", ""))
+        ws.cell(row=row, column=2, value=item.get("item_name_std", ""))
+        ws.cell(row=row, column=3, value=item.get("spec", ""))
+        ws.cell(row=row, column=4, value=item.get("unit", ""))
+        ws.cell(row=row, column=5, value=item.get("qty"))
+        ws.cell(row=row, column=6, value=item.get("unit_price"))
+        ws.cell(row=row, column=7, value=item.get("amount"))
+        ws.cell(row=row, column=8, value=item.get("process_major", ""))
+        ws.cell(row=row, column=9, value=item.get("process_minor", ""))
+        ws.cell(row=row, column=10, value=item.get("confidence"))
+        ws.cell(row=row, column=11, value="요검토" if item.get("review_flag") else "")
+
+    tmp = tempfile.mkdtemp(prefix="jh_pdf_result_")
+    stem = os.path.splitext(os.path.basename(original_filename))[0]
+    out_path = os.path.join(tmp, f"{stem}_result.xlsx")
+    wb.save(out_path)
+    return out_path
